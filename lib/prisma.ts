@@ -2,19 +2,26 @@ import { PrismaClient } from '@prisma/client'
 import { PrismaLibSql } from '@prisma/adapter-libsql'
 import { createClient } from '@libsql/client'
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
+declare global {
+  var prisma: PrismaClient | undefined
 }
 
-function createPrismaClient() {
-  const url = process.env.DATABASE_URL ?? 'file:./prisma/dev.db'
+function createPrismaClient(): PrismaClient {
+  const url = process.env.DATABASE_URL
   const authToken = process.env.DATABASE_AUTH_TOKEN
 
-  const libsql = createClient({ url, authToken })
+  if (!url) {
+    throw new Error('DATABASE_URL não definida')
+  }
+
+  const libsql = createClient({
+    url,
+    ...(authToken ? { authToken } : {}),
+  })
   const adapter = new PrismaLibSql(libsql)
   return new PrismaClient({ adapter } as any)
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient()
+export const prisma = global.prisma ?? createPrismaClient()
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+if (process.env.NODE_ENV !== 'production') global.prisma = prisma
