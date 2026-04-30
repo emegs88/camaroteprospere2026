@@ -1,36 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🤠 Camarote Prospere — Festa do Peão Hortolândia 2026
 
-## Getting Started
+Sistema web completo de gerenciamento de camarotes e convites digitais da **Prospere Consórcio**, Patrocinador Master da Festa do Peão de Hortolândia 2026.
 
-First, run the development server:
+## Funcionalidades
+
+- **Dashboard** com gráficos de ocupação e distribuição por tipo
+- **Gestão de Pessoas** — 6 tipos: Influencer, Cliente, Parceiro, VIP, Colaborador, Imprensa
+- **Mapa Visual** de ingressos por categoria (Backstage, Imóveis, Futsal)
+- **Convite Digital** com QR Code, download PNG e compartilhamento via WhatsApp
+- **CRM básico** para clientes com histórico de interações
+- **Painel de Influencers** com rastreamento de posts
+- **Shows** — cadastro e associação de ingressos
+- **Exportação CSV** por tipo de convidado
+- **Autenticação** com NextAuth.js
+
+## Estrutura de Ingressos
+
+| Categoria | Qtd |
+|-----------|-----|
+| Prospere Consórcio Backstage | 50 ingressos |
+| Prospere Imóveis (camarotes) | 10 ingressos |
+| Prospere Hortolândia Futsal (camarotes) | 10 ingressos |
+| **Total** | **70** |
+
+## Pré-requisitos
+
+- Node.js 18+
+- npm
+
+## Instalação
 
 ```bash
+# 1. Instalar dependências
+npm install
+
+# 2. Copiar variáveis de ambiente
+cp .env.example .env
+
+# 3. Rodar migrações do banco
+npx prisma migrate dev
+
+# 4. Popular banco com dados de exemplo
+npx ts-node --compiler-options '{"module":"CommonJS"}' prisma/seed.ts
+
+# 5. Gerar Prisma Client
+npx prisma generate
+
+# 6. Iniciar servidor de desenvolvimento
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse: **http://localhost:3000**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Credenciais Padrão
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+Email: admin@prospere.com.br
+Senha: prospere2026
+```
 
-## Learn More
+## Stack Técnica
 
-To learn more about Next.js, take a look at the following resources:
+- **Frontend:** Next.js 14, TypeScript, Tailwind CSS
+- **Backend:** API Routes do Next.js
+- **Banco de dados:** SQLite com Prisma ORM 7
+- **Autenticação:** NextAuth.js v4
+- **QR Code:** qrcode
+- **Convite visual:** html2canvas
+- **Gráficos:** Recharts
+- **Ícones:** Lucide React
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Identidade Visual
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Preto `#1a1a1a` · Dourado `#c9a84c` · Verde Escuro `#2d6a4f`
+- Fonte: Barlow (Google Fonts)
 
-## Deploy on Vercel
+## Estrutura de Pastas
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+app/
+  page.tsx              # Dashboard
+  login/page.tsx        # Login
+  pessoas/page.tsx      # Gestão de pessoas (6 sub-abas)
+  backstage/page.tsx    # 50 ingressos backstage
+  imoveis/page.tsx      # 10 camarotes imóveis
+  futsal/page.tsx       # 10 camarotes futsal
+  shows/page.tsx        # Gerenciamento de shows
+  convite/[token]/      # Convite público com QR Code
+  configuracoes/page.tsx # Exportação CSV e configurações
+  api/
+    auth/[...nextauth]/ # NextAuth
+    convidados/         # CRUD convidados
+    ingressos/          # CRUD ingressos
+    shows/              # CRUD shows
+    dashboard/          # Métricas do dashboard
+components/
+  Sidebar.tsx
+  AppLayout.tsx
+  BadgeTipo.tsx
+  Modal.tsx
+  FormConvidado.tsx
+  GridIngressos.tsx
+lib/
+  prisma.ts             # Cliente Prisma
+prisma/
+  schema.prisma         # Schema do banco
+  seed.ts               # Dados de exemplo
+  dev.db                # Banco SQLite (gerado)
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+© 2026 Prospere Consórcio · Patrocinador Master · Hortolândia, SP

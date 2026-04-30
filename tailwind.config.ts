@@ -11,6 +11,15 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        dourado: "#c9a84c",
+        "dourado-escuro": "#a8863a",
+        "verde-escuro": "#2d6a4f",
+        "preto-principal": "#1a1a1a",
+        "cinza-card": "#242424",
+        "cinza-borda": "#333333",
+      },
+      fontFamily: {
+        barlow: ["Barlow", "sans-serif"],
       },
     },
   },

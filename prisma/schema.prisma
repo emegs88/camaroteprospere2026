@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("ADMIN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  logs      LogAcao[]
+}
+
+model Show {
+  id         String      @id @default(cuid())
+  nome       String
+  artista    String
+  data       DateTime
+  horario    String
+  imagem     String?
+  banner     String?
+  descricao  String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  ingressos  Ingresso[]
+  convidados Convidado[]
+}
+
+model Ingresso {
+  id        String     @id @default(cuid())
+  numero    String     @unique
+  categoria String
+  status    String     @default("LIVRE")
+  showId    String?
+  show      Show?      @relation(fields: [showId], references: [id])
+  convidado Convidado?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Convidado {
+  id               String      @id @default(cuid())
+  nome             String
+  email            String?
+  telefone         String?
+  foto             String?
+  tipo             String
+
+  redeSocial       String?
+  handle           String?
+  seguidores       Int?
+  nicho            String?
+
+  statusPost       String?     @default("NAO_POSTOU")
+  linkPost         String?
+  avaliacaoPost    Int?
+
+  empresa          String?
+  produtoInteresse String?
+  statusCliente    String?
+  consultor        String?
+  observacoes      String?
+
+  tokenConvite     String      @unique @default(cuid())
+  conviteEnviado   Boolean     @default(false)
+  conviteEnviadoEm DateTime?
+
+  ingressoId       String?     @unique
+  ingresso         Ingresso?   @relation(fields: [ingressoId], references: [id])
+  showId           String?
+  show             Show?       @relation(fields: [showId], references: [id])
+  interacoes       Interacao[]
+
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+}
+
+model Interacao {
+  id          String    @id @default(cuid())
+  convidadoId String
+  convidado   Convidado @relation(fields: [convidadoId], references: [id], onDelete: Cascade)
+  tipo        String    @default("NOTA")
+  descricao   String
+  autor       String?
+  createdAt   DateTime  @default(now())
+}
+
+model LogAcao {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  acao      String
+  detalhes  String?
+  ip        String?
+  createdAt DateTime @default(now())
+}
