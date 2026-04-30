@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { AppLayout } from '@/components/AppLayout'
 import { Modal } from '@/components/Modal'
-import { Music, Plus, Trash2, Edit2, Calendar, Clock, Users, Upload, X } from 'lucide-react'
+import { Music, Plus, Trash2, Edit2, Calendar, Clock, Users, Upload, X, CloudSun, AlertCircle } from 'lucide-react'
 import Image from 'next/image'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -29,31 +29,57 @@ type Show = {
   _count?: { ingressos: number; convidados: number }
 }
 
+type Previsao = {
+  codigo: number
+  icone: string
+  descricao: string
+  tempMax: number
+  tempMin: number
+  chuva: number
+  vento: number
+}
+
 export default function ShowsPage() {
   const [shows, setShows] = useState<Show[]>([])
   const [fotasPastas, setFotosPastas] = useState<Record<string, string>>({})
+  const [previsoes, setPrevisoes] = useState<Record<string, Previsao>>({})
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [editando, setEditando] = useState<Show | null>(null)
   const [form, setForm] = useState({ nome: '', artista: '', data: '', horario: '21:00', descricao: '', imagem: '' })
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [seedLoading, setSeedLoading] = useState(false)
+  const [seedMsg, setSeedMsg] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   async function fetchShows() {
     setLoading(true)
-    const [resShows, resFotos] = await Promise.all([
+    const [resShows, resFotos, resPrevisao] = await Promise.all([
       fetch('/api/shows'),
       fetch('/api/shows/scan-fotos'),
+      fetch('/api/shows/previsao-tempo'),
     ])
     const dataShows = await resShows.json()
     const dataFotos = await resFotos.json()
+    const dataPrevisao = await resPrevisao.json()
     setShows(Array.isArray(dataShows) ? dataShows : [])
     setFotosPastas(dataFotos)
+    if (!dataPrevisao.error) setPrevisoes(dataPrevisao)
     setLoading(false)
   }
 
   useEffect(() => { fetchShows() }, [])
+
+  async function inicializarDados() {
+    setSeedLoading(true)
+    setSeedMsg('')
+    const res = await fetch('/api/seed', { method: 'POST' })
+    const data = await res.json()
+    setSeedMsg(data.msg || data.error || 'Feito!')
+    setSeedLoading(false)
+    fetchShows()
+  }
 
   function openNew() {
     setEditando(null)
@@ -140,15 +166,39 @@ export default function ShowsPage() {
         ) : shows.length === 0 ? (
           <div className="text-center py-16 text-gray-500">
             <Music size={48} className="mx-auto mb-4 opacity-30" />
-            <p>Nenhum show cadastrado</p>
-            <button onClick={openNew} className="mt-4 text-[#c9a84c] hover:underline text-sm">Cadastrar primeiro show</button>
+            <p className="text-lg mb-2">Nenhum show cadastrado</p>
+            <p className="text-sm text-gray-600 mb-6">Clique em "Inicializar" para popular os 6 shows da Festa do Peão 2026</p>
+
+            {seedMsg && (
+              <div className="max-w-md mx-auto mb-4 text-sm bg-[#1e1e1e] border border-[#333] rounded-xl px-4 py-3 text-gray-300">
+                {seedMsg}
+              </div>
+            )}
+
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={inicializarDados}
+                disabled={seedLoading}
+                className="flex items-center gap-2 bg-[#c9a84c] hover:bg-[#a8863a] disabled:opacity-50 text-black font-bold px-6 py-2.5 rounded-lg transition-colors"
+              >
+                {seedLoading ? (
+                  <div className="w-4 h-4 border-2 border-black/40 border-t-black rounded-full animate-spin" />
+                ) : (
+                  <Music size={16} />
+                )}
+                Inicializar Shows
+              </button>
+              <button onClick={openNew} className="text-[#c9a84c] hover:underline text-sm mt-1">
+                ou cadastrar manualmente
+              </button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             {shows.map((s, idx) => {
-              // Usa foto do banco OU detecta automaticamente da pasta
               const dataKey = s.data.split('T')[0]
               const fotoFinal = s.imagem || fotasPastas[dataKey] || null
+              const prev = previsoes[dataKey]
               return (
               <div key={s.id} className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl overflow-hidden hover:border-[#c9a84c]/50 hover:shadow-[0_0_24px_rgba(201,168,76,0.08)] transition-all group cursor-pointer">
                 {/* Área da foto */}
@@ -175,6 +225,15 @@ export default function ShowsPage() {
                     </span>
                   </div>
 
+                  {/* Previsão do tempo */}
+                  {prev && (
+                    <div className="absolute top-3 right-12 flex items-center gap-1.5 bg-black/70 backdrop-blur-sm px-2.5 py-1 rounded-full">
+                      <span className="text-base leading-none">{prev.icone}</span>
+                      <span className="text-white text-xs font-semibold">{prev.tempMax}°</span>
+                      <span className="text-gray-400 text-xs">{prev.tempMin}°</span>
+                    </div>
+                  )}
+
                   {/* Botões editar/excluir */}
                   <div className="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button onClick={() => openEdit(s)} className="p-1.5 bg-black/70 hover:bg-[#c9a84c] hover:text-black text-white rounded-lg transition-colors">
@@ -195,24 +254,44 @@ export default function ShowsPage() {
                 </div>
 
                 {/* Rodapé do card */}
-                <div className="px-4 py-3 flex items-center justify-between border-t border-[#222]">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1.5 text-gray-500 text-xs">
-                      <Clock size={12} className="text-[#c9a84c]/70" />
-                      {s.horario}
+                <div className="px-4 py-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-1.5 text-gray-400 text-xs">
+                        <Clock size={12} className="text-[#c9a84c]/70" />
+                        {s.horario}
+                      </div>
+                      <div className="flex items-center gap-1.5 text-gray-400 text-xs">
+                        <Users size={12} className="text-[#c9a84c]/70" />
+                        {s._count?.convidados ?? 0} convidados
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1.5 text-gray-500 text-xs">
-                      <Users size={12} className="text-[#c9a84c]/70" />
-                      {s._count?.convidados ?? 0} convidados
-                    </div>
+                    {!fotoFinal && (
+                      <button
+                        onClick={() => openEdit(s)}
+                        className="text-[10px] text-[#c9a84c]/60 hover:text-[#c9a84c] flex items-center gap-1 transition-colors"
+                      >
+                        <Upload size={10} /> foto
+                      </button>
+                    )}
                   </div>
-                  {!fotoFinal && (
-                    <button
-                      onClick={() => openEdit(s)}
-                      className="text-[10px] text-[#c9a84c]/60 hover:text-[#c9a84c] flex items-center gap-1 transition-colors"
-                    >
-                      <Upload size={10} /> foto
-                    </button>
+
+                  {/* Previsão expandida */}
+                  {prev && (
+                    <div className="flex items-center gap-3 pt-1 border-t border-[#2a2a2a] text-xs text-gray-400">
+                      <CloudSun size={12} className="text-[#c9a84c]/70 flex-shrink-0" />
+                      <span>{prev.descricao}</span>
+                      {prev.chuva > 0 && (
+                        <span className="text-blue-400 ml-auto flex-shrink-0">
+                          🌧 {prev.chuva}mm
+                        </span>
+                      )}
+                      {prev.chuva === 0 && (
+                        <span className="text-green-400 ml-auto flex-shrink-0 text-[10px]">
+                          Sem chuva
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

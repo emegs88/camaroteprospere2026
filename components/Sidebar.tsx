@@ -5,13 +5,14 @@ import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import {
-  LayoutDashboard, Users, Music, Settings, LogOut, Star, Building2, Trophy,
+  LayoutDashboard, Users, Music, Settings, LogOut, Star, Building2, Trophy, UserCheck,
 } from 'lucide-react'
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/pessoas', label: 'Pessoas', icon: Users },
   { href: '/shows', label: 'Shows', icon: Music },
+  { href: '/acesso', label: 'Convidar Cliente', icon: UserCheck },
 ]
 
 const ingressoItems = [
@@ -45,7 +46,7 @@ export function Sidebar() {
       {/* Nav principal */}
       <nav className="flex-1 p-3 overflow-y-auto space-y-5">
         <div>
-          <p className="text-[10px] text-gray-700 uppercase tracking-widest font-semibold px-2 mb-1.5">Geral</p>
+          <p className="text-[10px] text-gray-500 uppercase tracking-widest font-semibold px-2 mb-1.5">Geral</p>
           <div className="space-y-0.5">
             {navItems.map((item) => {
               const Icon = item.icon
@@ -55,7 +56,7 @@ export function Sidebar() {
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                     isActive
                       ? 'bg-[#c9a84c] text-black'
-                      : 'text-gray-500 hover:text-white hover:bg-[#1a1a1a]'
+                      : 'text-gray-400 hover:text-white hover:bg-[#1a1a1a]'
                   }`}
                 >
                   <Icon size={16} />

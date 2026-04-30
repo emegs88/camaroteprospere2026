@@ -162,8 +162,8 @@ export default function DashboardPage() {
                 </div>
               </div>
               <p className="text-4xl font-bold text-white">{value}</p>
-              <p className="text-gray-600 text-xs mt-1">{label}</p>
-              <p className="text-gray-700 text-[10px] mt-0.5">{sub}</p>
+              <p className="text-gray-300 text-xs mt-1 font-medium">{label}</p>
+              <p className="text-gray-500 text-[10px] mt-0.5">{sub}</p>
             </div>
           ))}
         </div>
@@ -190,7 +190,7 @@ export default function DashboardPage() {
                 <div className="w-full bg-[#222] rounded-full h-1.5">
                   <div className="h-1.5 rounded-full transition-all duration-700" style={{ width: `${pct}%`, background: cat.color }} />
                 </div>
-                <div className="flex justify-between text-[10px] text-gray-700 mt-1.5">
+                <div className="flex justify-between text-[10px] text-gray-500 mt-1.5">
                   <span>{m.livre} livres</span>
                   <span>{m.reservado} reservados</span>
                 </div>
@@ -206,10 +206,10 @@ export default function DashboardPage() {
             <h2 className="text-white font-semibold text-sm mb-5">Ocupação por Categoria</h2>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={barData} barCategoryGap="35%">
-                <XAxis dataKey="categoria" tick={{ fill: '#555', fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: '#555', fontSize: 11 }} axisLine={false} tickLine={false} />
+                <XAxis dataKey="categoria" tick={{ fill: '#888', fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: '#888', fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 10, color: '#fff', fontSize: 12 }} />
-                <Legend wrapperStyle={{ color: '#555', fontSize: 11 }} />
+                <Legend wrapperStyle={{ color: '#999', fontSize: 11 }} />
                 <Bar dataKey="Livre" fill="#2a2a2a" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="Reservado" fill="#c9a84c" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="Usado" fill="#2d6a4f" radius={[4, 4, 0, 0]} />
@@ -237,9 +237,9 @@ export default function DashboardPage() {
                     <div key={t.name} className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-1.5">
                         <div className="w-2 h-2 rounded-full" style={{ background: TIPO_COLORS[t.name] }} />
-                        <span className="text-gray-500">{t.label}</span>
+                        <span className="text-gray-300">{t.label}</span>
                       </div>
-                      <span className="text-gray-400 font-medium">{t.value}</span>
+                      <span className="text-white font-semibold">{t.value}</span>
                     </div>
                   ))}
                 </div>
@@ -265,7 +265,7 @@ export default function DashboardPage() {
               <thead>
                 <tr className="border-b border-[#1e1e1e]">
                   {['Convidado', 'Tipo', 'Ingresso', 'Show', 'Data'].map(h => (
-                    <th key={h} className="px-6 py-3 text-left text-gray-600 text-[10px] font-semibold uppercase tracking-widest">{h}</th>
+                    <th key={h} className="px-6 py-3 text-left text-gray-400 text-[10px] font-semibold uppercase tracking-widest">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -293,14 +293,14 @@ export default function DashboardPage() {
                       <td className="px-6 py-3.5"><BadgeTipo tipo={c.tipo} /></td>
                       <td className="px-6 py-3.5">
                         {c.ingresso ? (
-                          <span className="text-gray-400 text-xs font-mono">{c.ingresso.numero}</span>
-                        ) : <span className="text-gray-700">—</span>}
+                          <span className="text-gray-200 text-xs font-mono">{c.ingresso.numero}</span>
+                        ) : <span className="text-gray-600">—</span>}
                       </td>
                       <td className="px-6 py-3.5">
-                        <span className="text-gray-400 text-xs">{c.show?.artista ?? '—'}</span>
+                        <span className="text-gray-300 text-xs">{c.show?.artista ?? '—'}</span>
                       </td>
                       <td className="px-6 py-3.5">
-                        <div className="flex items-center gap-1 text-gray-600 text-xs">
+                        <div className="flex items-center gap-1 text-gray-400 text-xs">
                           <Clock size={10} />
                           {format(new Date(c.createdAt), "dd/MM · HH:mm", { locale: ptBR })}
                         </div>
