@@ -8,8 +8,8 @@ export async function GET() {
       orderBy: { createdAt: 'asc' },
     })
     return NextResponse.json(usuarios)
-  } catch (error) {
-    return NextResponse.json({ error: 'Erro ao buscar usuários' }, { status: 500 })
+  } catch (error: any) {
+    return NextResponse.json({ error: 'Erro ao buscar usuários', detail: error?.message ?? String(error) }, { status: 500 })
   }
 }
 
