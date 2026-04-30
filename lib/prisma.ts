@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaLibSql } from '@prisma/adapter-libsql'
-import { createClient } from '@libsql/client'
 
 declare global {
   var prisma: PrismaClient | undefined
@@ -14,11 +13,12 @@ function createPrismaClient(): PrismaClient {
     throw new Error('DATABASE_URL não definida')
   }
 
-  const libsql = createClient({
+  // PrismaLibSql é uma Factory que recebe config (url + authToken),
+  // não um cliente libsql já criado.
+  const adapter = new PrismaLibSql({
     url,
     ...(authToken ? { authToken } : {}),
   })
-  const adapter = new PrismaLibSql(libsql)
   return new PrismaClient({ adapter } as any)
 }
 
