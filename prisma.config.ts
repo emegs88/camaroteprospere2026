@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { defineConfig } from 'prisma/config'
 import { createClient } from '@libsql/client'
-import { PrismaLibSQL } from '@prisma/adapter-libsql'
+import { PrismaLibSql } from '@prisma/adapter-libsql'
 
 const url = process.env.DATABASE_URL ?? `file:${path.join(process.cwd(), 'prisma', 'dev.db')}`
 const authToken = process.env.DATABASE_AUTH_TOKEN
@@ -15,7 +15,7 @@ export default defineConfig({
   migrate: {
     adapter: async () => {
       const libsql = createClient({ url, authToken })
-      return new PrismaLibSQL(libsql)
+      return new PrismaLibSql(libsql)
     },
   },
 })
